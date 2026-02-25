@@ -25,6 +25,8 @@
     "validate": "npm run lint && npm run test && npm run test:contract",
     "ingest": "tsx scripts/ingest-pravo.ts",
     "ingest:census": "tsx scripts/ingest-pravo.ts --census-only",
+    "ingest:ruslawod": "python3 scripts/ingest-ruslawod.py",
+    "ingest:ruslawod:census": "python3 scripts/ingest-ruslawod.py --census-only",
     "check-updates": "tsx scripts/check-updates.ts"
   },
   "dependencies": {

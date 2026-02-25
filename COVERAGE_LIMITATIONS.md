@@ -173,10 +173,10 @@ Federal laws frequently delegate implementation details to subordinate legislati
 
 | Legal Source | Coverage | Impact on Professional Use | Workaround |
 |--------------|----------|---------------------------|------------|
-| **Federal Laws (FZ)** | Good | Low | N/A |
-| **Codes (Kodeksy)** | Good | Low | N/A |
-| **Constitution** | Good | Low | N/A |
-| **Federal Constitutional Laws** | Stubs | Medium | pravo.gov.ru |
+| **Federal Laws (FZ)** | 12,132 laws, full text | Low | N/A |
+| **Codes (Kodeksy)** | 43 codes, full text | Low | N/A |
+| **Constitution** | Full text (142 articles) | Low | N/A |
+| **Federal Constitutional Laws** | 193 FKZ, full text | Low | N/A |
 | **Regional Legislation** | Not Included | **High** | ConsultantPlus, Garant |
 | **Court Decisions** | Not Included | **High** | kad.arbitr.ru, sudrf.ru |
 | **Postanovleniya Plenuma** | Not Included | **High** | ConsultantPlus |

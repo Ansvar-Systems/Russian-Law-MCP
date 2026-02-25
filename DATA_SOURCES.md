@@ -105,17 +105,31 @@ This Tool does **NOT** include commercial database content, but professional use
 ### Statute Data Pipeline
 
 ```
-pravo.gov.ru -> Ingestion Script -> HTML Parse -> SQLite Database -> MCP Tool
+RusLawOD (Hugging Face) -> DuckDB Remote Query -> Article Parser -> Seed JSON -> SQLite + FTS5
+pravo.gov.ru (fallback)  -> HTTP Fetch -> HTML Parse -> Seed JSON -> SQLite + FTS5
 ```
 
-1. **Ingestion**: `npm run ingest` fetches law pages from pravo.gov.ru
-2. **Parsing**: Extract articles, chapters, sections from HTML
-3. **Storage**: Normalized in SQLite with FTS5 indexing
-4. **Update Check**: Freshness monitoring compares local vs. remote dates
+**Primary pipeline** (RusLawOD / DuckDB):
+1. **Query**: DuckDB reads remote parquet files via HTTP range requests
+2. **Filter**: Only federal legislation extracted (~12K of 304K documents)
+3. **Parse**: Article-level provisions extracted from full text
+4. **Storage**: Seed JSON files → SQLite with FTS5 indexing
+
+**Fallback pipeline** (pravo.gov.ru direct):
+1. **Fetch**: HTTP requests to pravo.gov.ru/proxy/ips/
+2. **Parse**: HTML → articles via Cheerio + regex
+3. **Storage**: Same seed JSON → SQLite pipeline
+
+**Run ingestion**:
+```bash
+npm run ingest:ruslawod   # Primary (RusLawOD via DuckDB)
+npm run ingest            # Fallback (pravo.gov.ru direct)
+npm run build:db          # Rebuild database from seed files
+```
 
 **Frequency**: Periodic (manual or scheduled) -- NOT automatic real-time sync
 
-**Lag Time**: Depends on when ingestion was last run
+**Lag Time**: RusLawOD dataset covers through 2023. Newer laws require direct pravo.gov.ru ingestion.
 
 ---
 

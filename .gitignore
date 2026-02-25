@@ -6,6 +6,7 @@ data/*.db
 data/*.db-journal
 data/*.db.gz
 data/seed/
+data/ruslawod/
 *.tgz
 coverage/
 .DS_Store
