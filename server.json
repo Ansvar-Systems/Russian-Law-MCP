@@ -1,0 +1,28 @@
+{
+  "$schema": "https://registry.modelcontextprotocol.io/schemas/server.json",
+  "name": "eu.ansvar/russian-law-mcp",
+  "description": "Query Russian federal legislation — 108 laws, 5,364 provisions with full-text search",
+  "repository": {
+    "url": "https://github.com/Ansvar-Systems/Russian-Law-MCP",
+    "source": "github"
+  },
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "@ansvar/russian-law-mcp",
+      "version": "0.1.0",
+      "transport": { "type": "stdio" }
+    },
+    {
+      "registryType": "npm",
+      "identifier": "@ansvar/russian-law-mcp",
+      "version": "0.1.0",
+      "transport": {
+        "type": "streamable-http",
+        "url": "https://russian-law-mcp.vercel.app/mcp"
+      }
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "name": "eu.ansvar/russian-law-mcp",
+  "version": "0.1.0",
+  "description": "Query Russian federal legislation — 108 laws, 5,364 provisions with full-text search",
+  "tools": [
+    {
+      "name": "search_legislation",
+      "description": "Search Russian statutes and regulations by keyword. FTS5 with BM25 ranking."
+    },
+    {
+      "name": "get_provision",
+      "description": "Retrieve a specific provision from a Russian statute by document ID and section."
+    },
+    {
+      "name": "validate_citation",
+      "description": "Validate a Russian legal citation against the database. Zero-hallucination enforcer."
+    },
+    {
+      "name": "build_legal_stance",
+      "description": "Build comprehensive citations for a legal question across all Russian statutes."
+    },
+    {
+      "name": "format_citation",
+      "description": "Format a Russian legal citation per standard conventions (full, short, pinpoint)."
+    },
+    {
+      "name": "check_currency",
+      "description": "Check if a Russian statute or provision is currently in force."
+    },
+    {
+      "name": "get_eu_basis",
+      "description": "Get EU/international legal basis for a Russian statute."
+    },
+    {
+      "name": "get_russian_implementations",
+      "description": "Find Russian statutes implementing a specific EU directive or regulation."
+    },
+    {
+      "name": "search_eu_implementations",
+      "description": "Search EU directives/regulations with Russian implementation information."
+    },
+    {
+      "name": "get_provision_eu_basis",
+      "description": "Get EU legal basis for a specific provision within a Russian statute."
+    },
+    {
+      "name": "validate_eu_compliance",
+      "description": "Validate EU compliance status for a Russian statute or provision."
+    },
+    {
+      "name": "list_sources",
+      "description": "List all data sources with provenance metadata, coverage scope, and known limitations."
+    },
+    {
+      "name": "about",
+      "description": "Server metadata, dataset statistics, freshness, and provenance."
+    }
+  ]
+}
