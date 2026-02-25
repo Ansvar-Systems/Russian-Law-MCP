@@ -44,7 +44,7 @@ export async function checkCurrency(
   }
 
   const doc = db.prepare(`
-    SELECT id, title, status, type, issued_date, in_force_date, description, last_updated
+    SELECT id, title, status, law_type as type, publication_date as issued_date, effective_date as in_force_date, description, last_updated
     FROM laws
     WHERE id = ?
   `).get(input.document_id) as DocumentRow | undefined;
@@ -72,7 +72,7 @@ export async function checkCurrency(
   let provisionExists: boolean | undefined;
   if (input.provision_ref) {
     const prov = db.prepare(
-      'SELECT 1 FROM provisions WHERE document_id = ? AND provision_ref = ?'
+      'SELECT 1 FROM provisions WHERE law_id = ? AND provision_ref = ?'
     ).get(input.document_id, input.provision_ref);
     provisionExists = !!prov;
 

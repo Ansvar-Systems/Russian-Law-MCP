@@ -70,11 +70,11 @@ export async function validateCitationTool(
   // Try to find the document in the database
   // Search by number if available, or by title for codes
   if (parsed.number) {
-    // Search by law number (e.g., "152-ФЗ")
+    // Search by law number/identifier (e.g., "152-ФЗ")
     const doc = db.prepare(`
       SELECT id, title, status
       FROM laws
-      WHERE number = ? OR id LIKE ?
+      WHERE identifier = ? OR id LIKE ?
       LIMIT 1
     `).get(parsed.number, `%${parsed.number}%`) as { id: string; title: string; status: string } | undefined;
 
@@ -91,9 +91,9 @@ export async function validateCitationTool(
       if (parsed.article) {
         const prov = db.prepare(`
           SELECT 1 FROM provisions
-          WHERE document_id = ? AND (
+          WHERE law_id = ? AND (
             provision_ref = ? OR
-            section = ? OR
+            article = ? OR
             provision_ref LIKE ?
           )
           LIMIT 1

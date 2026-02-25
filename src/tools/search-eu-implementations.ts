@@ -57,9 +57,9 @@ export async function searchEUImplementations(
       ed.short_name,
       ed.community,
       ed.celex_number,
-      COUNT(DISTINCT er.document_id) AS russian_statute_count,
-      GROUP_CONCAT(DISTINCT CASE WHEN er.is_primary_implementation = 1 THEN er.document_id END) AS primary_implementations,
-      GROUP_CONCAT(DISTINCT er.document_id) AS all_references
+      COUNT(DISTINCT er.law_id) AS russian_statute_count,
+      GROUP_CONCAT(DISTINCT CASE WHEN er.is_primary_implementation = 1 THEN er.law_id END) AS primary_implementations,
+      GROUP_CONCAT(DISTINCT er.law_id) AS all_references
     FROM eu_documents ed
     LEFT JOIN eu_references er ON ed.id = er.eu_document_id
     WHERE 1=1

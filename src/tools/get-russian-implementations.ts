@@ -103,7 +103,7 @@ export async function getRussianImplementations(
       ) AS implementation_status,
       GROUP_CONCAT(DISTINCT er.eu_article) AS articles_referenced
     FROM laws l
-    JOIN eu_references er ON l.id = er.document_id
+    JOIN eu_references er ON l.id = er.law_id
     WHERE er.eu_document_id = ?
   `;
 

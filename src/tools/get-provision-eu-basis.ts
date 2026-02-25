@@ -50,7 +50,7 @@ export async function getProvisionEUBasis(
   const provision = db.prepare(`
     SELECT id, content
     FROM provisions
-    WHERE document_id = ? AND provision_ref = ?
+    WHERE law_id = ? AND provision_ref = ?
   `).get(input.document_id, input.provision_ref) as
     | { id: number; content: string }
     | undefined;

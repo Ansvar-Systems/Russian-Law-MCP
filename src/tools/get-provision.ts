@@ -75,18 +75,18 @@ export async function getProvision(
 
   const sql = `
     SELECT
-      p.document_id,
+      p.law_id as document_id,
       l.title as document_title,
       l.status as document_status,
       p.provision_ref,
-      p.chapter,
-      p.section,
+      p.article as chapter,
+      p.article as section,
       p.title,
       p.content,
       p.metadata
     FROM provisions p
-    JOIN laws l ON l.id = p.document_id
-    WHERE p.document_id = ? AND p.provision_ref = ?
+    JOIN laws l ON l.id = p.law_id
+    WHERE p.law_id = ? AND p.provision_ref = ?
   `;
   const row = db.prepare(sql).get(input.document_id, provisionRef) as ProvisionRow | undefined;
 
@@ -98,9 +98,9 @@ export async function getProvision(
   }
 
   const crossRefs = db.prepare(`
-    SELECT target_document_id, target_provision_ref, ref_type
+    SELECT target_law_id as target_document_id, target_provision_ref, ref_type
     FROM cross_references
-    WHERE source_document_id = ? AND (source_provision_ref = ? OR source_provision_ref IS NULL)
+    WHERE source_law_id = ? AND (source_provision_ref = ? OR source_provision_ref IS NULL)
   `).all(input.document_id, provisionRef) as CrossRefResult[];
 
   return {
@@ -116,18 +116,18 @@ export async function getProvision(
 function getAllProvisions(db: Database, documentId: string, limit?: number): ProvisionResult[] {
   const sql = `
     SELECT
-      p.document_id,
+      p.law_id as document_id,
       l.title as document_title,
       l.status as document_status,
       p.provision_ref,
-      p.chapter,
-      p.section,
+      p.article as chapter,
+      p.article as section,
       p.title,
       p.content,
       p.metadata
     FROM provisions p
-    JOIN laws l ON l.id = p.document_id
-    WHERE p.document_id = ?
+    JOIN laws l ON l.id = p.law_id
+    WHERE p.law_id = ?
     ORDER BY p.id
     ${limit ? 'LIMIT ?' : ''}
   `;

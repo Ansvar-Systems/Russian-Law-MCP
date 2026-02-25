@@ -45,22 +45,22 @@ export async function searchLegislation(
 
   let sql = `
     SELECT
-      p.document_id,
+      p.law_id as document_id,
       l.title as document_title,
       p.provision_ref,
-      p.chapter,
-      p.section,
+      p.article as chapter,
+      p.article as section,
       p.title,
       snippet(provisions_fts, 0, '>>>', '<<<', '...', 32) as snippet,
       bm25(provisions_fts) as relevance
     FROM provisions_fts
     JOIN provisions p ON p.id = provisions_fts.rowid
-    JOIN laws l ON l.id = p.document_id
+    JOIN laws l ON l.id = p.law_id
     WHERE provisions_fts MATCH ?
   `;
 
   if (input.document_id) {
-    sql += ` AND p.document_id = ?`;
+    sql += ` AND p.law_id = ?`;
     params.push(input.document_id);
   }
 

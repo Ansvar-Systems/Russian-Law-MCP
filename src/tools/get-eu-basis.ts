@@ -91,7 +91,7 @@ export async function getEUBasis(
       GROUP_CONCAT(DISTINCT er.eu_article) AS articles
     FROM eu_documents ed
     JOIN eu_references er ON ed.id = er.eu_document_id
-    WHERE er.document_id = ?
+    WHERE er.law_id = ?
   `;
 
   const params: (string | number)[] = [input.document_id];

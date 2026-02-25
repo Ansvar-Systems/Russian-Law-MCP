@@ -50,7 +50,7 @@ export async function buildLegalStance(
   // Search provisions
   let provSql = `
     SELECT
-      p.document_id,
+      p.law_id as document_id,
       l.title as document_title,
       p.provision_ref,
       p.title,
@@ -58,14 +58,14 @@ export async function buildLegalStance(
       bm25(provisions_fts) as relevance
     FROM provisions_fts
     JOIN provisions p ON p.id = provisions_fts.rowid
-    JOIN laws l ON l.id = p.document_id
+    JOIN laws l ON l.id = p.law_id
     WHERE provisions_fts MATCH ?
   `;
 
   const provParams: (string | number)[] = [];
 
   if (input.document_id) {
-    provSql += ` AND p.document_id = ?`;
+    provSql += ` AND p.law_id = ?`;
     provParams.push(input.document_id);
   }
 

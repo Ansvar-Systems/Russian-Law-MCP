@@ -60,7 +60,7 @@ export async function validateEUCompliance(
   if (input.provision_ref) {
     const provision = db.prepare(`
       SELECT id FROM provisions
-      WHERE document_id = ? AND provision_ref = ?
+      WHERE law_id = ? AND provision_ref = ?
     `).get(input.document_id, input.provision_ref) as { id: number } | undefined;
 
     if (!provision) {
@@ -85,7 +85,7 @@ export async function validateEUCompliance(
       er.implementation_status
     FROM eu_documents ed
     JOIN eu_references er ON ed.id = er.eu_document_id
-    WHERE er.document_id = ?
+    WHERE er.law_id = ?
   `;
 
   const params: (string | number)[] = [input.document_id];
