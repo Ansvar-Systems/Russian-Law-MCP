@@ -1,0 +1,54 @@
+{
+  "name": "@ansvar/russian-law-mcp",
+  "version": "0.1.0",
+  "description": "Production-grade Russian legal research MCP server with comprehensive federal legislation coverage and EU/international law cross-references",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "russian-law-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "data/database.db"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "build:db": "tsx scripts/build-db.ts",
+    "dev": "tsx src/index.ts",
+    "start": "node dist/index.js",
+    "test": "vitest run",
+    "test:contract": "vitest run __tests__/contract/",
+    "test:watch": "vitest",
+    "lint": "tsc --noEmit",
+    "drift:detect": "tsx scripts/drift-detect.ts",
+    "validate": "npm run lint && npm run test && npm run test:contract",
+    "ingest": "tsx scripts/ingest-pravo.ts",
+    "ingest:census": "tsx scripts/ingest-pravo.ts --census-only",
+    "check-updates": "tsx scripts/check-updates.ts"
+  },
+  "dependencies": {
+    "@ansvar/mcp-sqlite": "^1.0.3",
+    "@modelcontextprotocol/sdk": "^1.25.3"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^22.15.29",
+    "better-sqlite3": "^12.6.2",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "Apache-2.0",
+  "homepage": "https://ansvar.eu/open-law",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Ansvar-Systems/Russian-Law-MCP"
+  },
+  "mcpName": "eu.ansvar/russian-law-mcp",
+  "keywords": [
+    "law", "legislation", "russia", "russian", "legal-research", "compliance", "mcp", "open-law"
+  ]
+}
