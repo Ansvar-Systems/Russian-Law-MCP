@@ -50,12 +50,12 @@ RUN npm ci --omit=dev
 # Copy compiled JavaScript from builder stage
 COPY --from=builder /app/dist ./dist
 
-# Copy pre-built database
-COPY data/database.db ./data/database.db
+# Security: non-root user (create BEFORE copying large files to avoid chown layer)
+RUN addgroup -S nodejs && adduser -S nodejs -G nodejs
 
-# Security: non-root user
-RUN addgroup -S nodejs && adduser -S nodejs -G nodejs \
- && chown -R nodejs:nodejs /app/data
+# Copy pre-built database (--chown avoids a separate 542MB chown layer)
+COPY --chown=nodejs:nodejs data/database.db ./data/database.db
+
 USER nodejs
 
 # Environment
