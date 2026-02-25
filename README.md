@@ -37,12 +37,12 @@ This MCP server makes Russian federal law **searchable, cross-referenceable, and
 
 > Connect directly to the hosted version -- zero dependencies, nothing to install.
 
-**Endpoint:** `https://russian-law-mcp.vercel.app/mcp`
+**Endpoint:** `https://russian-law-mcp.fly.dev/mcp`
 
 | Client | How to Connect |
 |--------|---------------|
 | **Claude.ai** | Settings > Connectors > Add Integration > paste URL |
-| **Claude Code** | `claude mcp add russian-law --transport http https://russian-law-mcp.vercel.app/mcp` |
+| **Claude Code** | `claude mcp add russian-law --transport http https://russian-law-mcp.fly.dev/mcp` |
 | **Claude Desktop** | Add to config (see below) |
 | **GitHub Copilot** | Add to VS Code settings (see below) |
 
@@ -53,7 +53,7 @@ This MCP server makes Russian federal law **searchable, cross-referenceable, and
   "mcpServers": {
     "russian-law": {
       "type": "url",
-      "url": "https://russian-law-mcp.vercel.app/mcp"
+      "url": "https://russian-law-mcp.fly.dev/mcp"
     }
   }
 }
@@ -66,7 +66,7 @@ This MCP server makes Russian federal law **searchable, cross-referenceable, and
   "github.copilot.chat.mcp.servers": {
     "russian-law": {
       "type": "http",
-      "url": "https://russian-law-mcp.vercel.app/mcp"
+      "url": "https://russian-law-mcp.fly.dev/mcp"
     }
   }
 }
