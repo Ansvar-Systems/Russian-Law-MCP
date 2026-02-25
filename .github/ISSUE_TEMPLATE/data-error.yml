@@ -1,0 +1,69 @@
+name: Data Error Report
+description: Report incorrect, missing, or outdated legal data
+title: "[DATA] "
+labels: ["data-error"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Data Error Report
+
+        **MCP Server:** Russian Law MCP
+        **Jurisdiction:** RU
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What is incorrect?
+      description: Describe the data error you found
+    validations:
+      required: true
+
+  - type: input
+    id: law-identifier
+    attributes:
+      label: Law Identifier
+      description: "Federal law number or code name (e.g., 152-FZ, UK RF)"
+      placeholder: "e.g., 152-FZ"
+    validations:
+      required: true
+
+  - type: input
+    id: article
+    attributes:
+      label: Article/Section
+      description: "Specific article or section number"
+      placeholder: "e.g., Article 9"
+
+  - type: input
+    id: official-url
+    attributes:
+      label: Official URL
+      description: "Link to the correct text on pravo.gov.ru or other official source"
+      placeholder: "http://pravo.gov.ru/..."
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected content
+      description: What should the correct data look like?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Current (incorrect) content
+      description: What does the MCP currently return?
+
+  - type: checkboxes
+    id: discovery
+    attributes:
+      label: How did you discover this?
+      options:
+        - label: Compared with pravo.gov.ru
+        - label: Compared with ConsultantPlus
+        - label: Compared with Garant
+        - label: User report
+        - label: "Other (please specify in description)"
