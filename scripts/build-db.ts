@@ -117,6 +117,20 @@ CREATE TRIGGER provisions_au AFTER UPDATE ON provisions BEGIN
     VALUES (new.rowid, new.content, new.title, new.article);
 END;
 
+-- EU documents (directives and regulations referenced by Russian law)
+CREATE TABLE IF NOT EXISTS eu_documents (
+    id TEXT PRIMARY KEY,
+    document_type TEXT NOT NULL,
+    document_number TEXT,
+    title TEXT NOT NULL,
+    short_title TEXT,
+    celex TEXT,
+    year INTEGER,
+    community TEXT DEFAULT 'EU',
+    in_force INTEGER DEFAULT 1,
+    source_url TEXT
+);
+
 -- EU references linking Russian law provisions to EU directives/regulations
 CREATE TABLE eu_references (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -266,12 +280,16 @@ function buildDatabase(): void {
 
   loadAll();
 
-  writeBuildMetadata(db, totalLaws, totalProvisions);
+  // Get actual counts from the database (INSERT OR IGNORE may skip duplicates)
+  const actualLaws = db.prepare('SELECT COUNT(*) as c FROM laws').get() as { c: number };
+  const actualProvisions = db.prepare('SELECT COUNT(*) as c FROM provisions').get() as { c: number };
+
+  writeBuildMetadata(db, actualLaws.c, actualProvisions.c);
   finalizeDatabase(db);
 
   const size = fs.statSync(DB_PATH).size;
   console.log(
-    `\nBuild complete: ${totalLaws} laws, ${totalProvisions} provisions`
+    `\nBuild complete: ${actualLaws.c} laws, ${actualProvisions.c} provisions`
   );
   console.log(`Output: ${DB_PATH} (${(size / 1024).toFixed(1)} KB)`);
 }

@@ -46,114 +46,125 @@ export async function searchEUImplementations(
 ): Promise<ToolResponse<SearchEUImplementationsResult>> {
   const limit = Math.min(Math.max(input.limit ?? DEFAULT_LIMIT, 1), MAX_LIMIT);
 
-  // Build search query
-  let sql = `
-    SELECT
-      ed.id,
-      ed.type,
-      ed.year,
-      ed.number,
-      ed.title,
-      ed.short_name,
-      ed.community,
-      ed.celex_number,
-      COUNT(DISTINCT er.law_id) AS russian_statute_count,
-      GROUP_CONCAT(DISTINCT CASE WHEN er.is_primary_implementation = 1 THEN er.law_id END) AS primary_implementations,
-      GROUP_CONCAT(DISTINCT er.law_id) AS all_references
-    FROM eu_documents ed
-    LEFT JOIN eu_references er ON ed.id = er.eu_document_id
-    WHERE 1=1
-  `;
+  try {
+    // Build search query
+    let sql = `
+      SELECT
+        ed.id,
+        ed.type,
+        ed.year,
+        ed.number,
+        ed.title,
+        ed.short_name,
+        ed.community,
+        ed.celex_number,
+        COUNT(DISTINCT er.law_id) AS russian_statute_count,
+        GROUP_CONCAT(DISTINCT CASE WHEN er.is_primary_implementation = 1 THEN er.law_id END) AS primary_implementations,
+        GROUP_CONCAT(DISTINCT er.law_id) AS all_references
+      FROM eu_documents ed
+      LEFT JOIN eu_references er ON ed.id = er.eu_document_id
+      WHERE 1=1
+    `;
 
-  const params: (string | number)[] = [];
+    const params: (string | number)[] = [];
 
-  // Text search on title, short_name, or CELEX
-  if (input.query && input.query.trim()) {
-    const searchTerm = `%${input.query.trim()}%`;
-    sql += ` AND (
-      ed.title LIKE ? OR
-      ed.short_name LIKE ? OR
-      ed.celex_number LIKE ?
-    )`;
-    params.push(searchTerm, searchTerm, searchTerm);
-  }
-
-  // Filter by type
-  if (input.type) {
-    sql += ` AND ed.type = ?`;
-    params.push(input.type);
-  }
-
-  // Filter by year range
-  if (input.year_from) {
-    sql += ` AND ed.year >= ?`;
-    params.push(input.year_from);
-  }
-  if (input.year_to) {
-    sql += ` AND ed.year <= ?`;
-    params.push(input.year_to);
-  }
-
-  sql += ` GROUP BY ed.id`;
-
-  // Filter by Russian implementation existence
-  if (input.has_russian_implementation !== undefined) {
-    if (input.has_russian_implementation) {
-      sql += ` HAVING russian_statute_count > 0`;
-    } else {
-      sql += ` HAVING russian_statute_count = 0`;
+    // Text search on title, short_name, or CELEX
+    if (input.query && input.query.trim()) {
+      const searchTerm = `%${input.query.trim()}%`;
+      sql += ` AND (
+        ed.title LIKE ? OR
+        ed.short_name LIKE ? OR
+        ed.celex_number LIKE ?
+      )`;
+      params.push(searchTerm, searchTerm, searchTerm);
     }
+
+    // Filter by type
+    if (input.type) {
+      sql += ` AND ed.type = ?`;
+      params.push(input.type);
+    }
+
+    // Filter by year range
+    if (input.year_from) {
+      sql += ` AND ed.year >= ?`;
+      params.push(input.year_from);
+    }
+    if (input.year_to) {
+      sql += ` AND ed.year <= ?`;
+      params.push(input.year_to);
+    }
+
+    sql += ` GROUP BY ed.id`;
+
+    // Filter by Russian implementation existence
+    if (input.has_russian_implementation !== undefined) {
+      if (input.has_russian_implementation) {
+        sql += ` HAVING russian_statute_count > 0`;
+      } else {
+        sql += ` HAVING russian_statute_count = 0`;
+      }
+    }
+
+    sql += `
+      ORDER BY ed.year DESC, ed.number DESC
+      LIMIT ?
+    `;
+    params.push(limit);
+
+    interface QueryRow {
+      id: string;
+      type: 'directive' | 'regulation';
+      year: number;
+      number: number;
+      title: string | null;
+      short_name: string | null;
+      community: string | null;
+      celex_number: string | null;
+      russian_statute_count: number;
+      primary_implementations: string | null;
+      all_references: string | null;
+    }
+
+    const rows = db.prepare(sql).all(...params) as QueryRow[];
+
+    // Transform results
+    const results = rows.map(row => ({
+      eu_document: {
+        id: row.id,
+        type: row.type,
+        year: row.year,
+        number: row.number,
+        title: row.title || undefined,
+        short_name: row.short_name || undefined,
+        community: row.community || undefined,
+        celex_number: row.celex_number || undefined,
+      },
+      russian_statute_count: row.russian_statute_count,
+      primary_implementations: row.primary_implementations
+        ? row.primary_implementations.split(',').filter(s => s)
+        : [],
+      all_references: row.all_references
+        ? row.all_references.split(',').filter(s => s)
+        : [],
+    }));
+
+    return {
+      results: {
+        results,
+        total_results: results.length,
+        query_info: input,
+      },
+      _metadata: generateResponseMetadata(db),
+    };
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    if (msg.includes('no such table')) {
+      return {
+        results: { message: 'EU cross-reference data is not yet populated for Russian law. This feature will be available in a future update.' },
+        _metadata: generateResponseMetadata(db),
+      } as unknown as ToolResponse<SearchEUImplementationsResult>;
+    }
+    throw err;
   }
-
-  sql += `
-    ORDER BY ed.year DESC, ed.number DESC
-    LIMIT ?
-  `;
-  params.push(limit);
-
-  interface QueryRow {
-    id: string;
-    type: 'directive' | 'regulation';
-    year: number;
-    number: number;
-    title: string | null;
-    short_name: string | null;
-    community: string | null;
-    celex_number: string | null;
-    russian_statute_count: number;
-    primary_implementations: string | null;
-    all_references: string | null;
-  }
-
-  const rows = db.prepare(sql).all(...params) as QueryRow[];
-
-  // Transform results
-  const results = rows.map(row => ({
-    eu_document: {
-      id: row.id,
-      type: row.type,
-      year: row.year,
-      number: row.number,
-      title: row.title || undefined,
-      short_name: row.short_name || undefined,
-      community: row.community || undefined,
-      celex_number: row.celex_number || undefined,
-    },
-    russian_statute_count: row.russian_statute_count,
-    primary_implementations: row.primary_implementations
-      ? row.primary_implementations.split(',').filter(s => s)
-      : [],
-    all_references: row.all_references
-      ? row.all_references.split(',').filter(s => s)
-      : [],
-  }));
-
-  return {
-    results: {
-      results,
-      total_results: results.length,
-      query_info: input,
-    },
-    _metadata: generateResponseMetadata(db),
-  };
 }

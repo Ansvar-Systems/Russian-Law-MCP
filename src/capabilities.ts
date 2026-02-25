@@ -34,7 +34,7 @@ export interface DbMetadata {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const CAPABILITY_TABLES: Record<Capability, string> = {
-  core_legislation: 'legal_provisions',
+  core_legislation: 'provisions',
   basic_case_law: 'case_law',
   eu_references: 'eu_references',
   expanded_case_law: 'case_law_full',

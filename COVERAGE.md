@@ -4,6 +4,14 @@
 
 Last updated: 2026-02-25
 
+## Coverage Status
+
+- **Laws with full article-level text:** 28 of 108 (including all major codes and key federal laws)
+- **Laws with metadata only:** 80 of 108 (title, identifier, status available; article text pending re-ingestion)
+- **Total provisions:** 5,364
+
+The 80 metadata-only laws have placeholder provisions due to intermittent HTTP 500 errors from pravo.gov.ru during initial ingestion. Re-running `npm run ingest` will attempt to fetch these laws again. Coverage improves with each re-run as the government server becomes available.
+
 ---
 
 ## Constitution (1 document, 142 provisions)

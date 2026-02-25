@@ -62,67 +62,78 @@ export async function getProvisionEUBasis(
   }
 
   // Get EU references for this provision
-  const sql = `
-    SELECT
-      ed.id,
-      ed.type,
-      ed.title,
-      ed.short_name,
-      er.eu_article,
-      er.reference_type,
-      er.full_citation,
-      er.reference_context
-    FROM eu_documents ed
-    JOIN eu_references er ON ed.id = er.eu_document_id
-    WHERE er.provision_id = ?
-    ORDER BY
-      CASE er.reference_type
-        WHEN 'implements' THEN 1
-        WHEN 'supplements' THEN 2
-        WHEN 'cites_article' THEN 3
-        ELSE 4
-      END,
-      ed.year DESC
-  `;
+  try {
+    const sql = `
+      SELECT
+        ed.id,
+        ed.type,
+        ed.title,
+        ed.short_name,
+        er.eu_article,
+        er.reference_type,
+        er.full_citation,
+        er.reference_context
+      FROM eu_documents ed
+      JOIN eu_references er ON ed.id = er.eu_document_id
+      WHERE er.provision_id = ?
+      ORDER BY
+        CASE er.reference_type
+          WHEN 'implements' THEN 1
+          WHEN 'supplements' THEN 2
+          WHEN 'cites_article' THEN 3
+          ELSE 4
+        END,
+        ed.year DESC
+    `;
 
-  interface QueryRow {
-    id: string;
-    type: 'directive' | 'regulation';
-    title: string | null;
-    short_name: string | null;
-    eu_article: string | null;
-    reference_type: string;
-    full_citation: string | null;
-    reference_context: string | null;
-  }
+    interface QueryRow {
+      id: string;
+      type: 'directive' | 'regulation';
+      title: string | null;
+      short_name: string | null;
+      eu_article: string | null;
+      reference_type: string;
+      full_citation: string | null;
+      reference_context: string | null;
+    }
 
-  const rows = db.prepare(sql).all(provision.id) as QueryRow[];
+    const rows = db.prepare(sql).all(provision.id) as QueryRow[];
 
-  const euReferences: ProvisionEUReference[] = rows.map(row => {
-    const ref: ProvisionEUReference = {
-      id: row.id,
-      type: row.type,
-      reference_type: row.reference_type,
-      full_citation: row.full_citation || row.id,
+    const euReferences: ProvisionEUReference[] = rows.map(row => {
+      const ref: ProvisionEUReference = {
+        id: row.id,
+        type: row.type,
+        reference_type: row.reference_type,
+        full_citation: row.full_citation || row.id,
+      };
+
+      if (row.title) ref.title = row.title;
+      if (row.short_name) ref.short_name = row.short_name;
+      if (row.eu_article) ref.article = row.eu_article;
+      if (row.reference_context) ref.context = row.reference_context;
+
+      return ref;
+    });
+
+    const result: GetProvisionEUBasisResult = {
+      document_id: input.document_id,
+      provision_ref: input.provision_ref,
+      provision_content: provision.content,
+      eu_references: euReferences,
     };
 
-    if (row.title) ref.title = row.title;
-    if (row.short_name) ref.short_name = row.short_name;
-    if (row.eu_article) ref.article = row.eu_article;
-    if (row.reference_context) ref.context = row.reference_context;
-
-    return ref;
-  });
-
-  const result: GetProvisionEUBasisResult = {
-    document_id: input.document_id,
-    provision_ref: input.provision_ref,
-    provision_content: provision.content,
-    eu_references: euReferences,
-  };
-
-  return {
-    results: result,
-    _metadata: generateResponseMetadata(db),
-  };
+    return {
+      results: result,
+      _metadata: generateResponseMetadata(db),
+    };
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    if (msg.includes('no such table')) {
+      return {
+        results: { message: 'EU cross-reference data is not yet populated for Russian law. This feature will be available in a future update.' },
+        _metadata: generateResponseMetadata(db),
+      } as unknown as ToolResponse<GetProvisionEUBasisResult>;
+    }
+    throw err;
+  }
 }
