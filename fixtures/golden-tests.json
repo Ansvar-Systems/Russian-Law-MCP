@@ -1,0 +1,118 @@
+{
+  "schema_version": "1.0",
+  "jurisdiction": "RU",
+  "tests": [
+    {
+      "id": "ru-001",
+      "tool": "get_provision",
+      "description": "Retrieve Article 1 of the Constitution",
+      "input": { "document_id": "constitution-rf", "section": "1" },
+      "assertions": ["result_not_empty"]
+    },
+    {
+      "id": "ru-002",
+      "tool": "search_legislation",
+      "description": "Search for personal data (персональные данные)",
+      "input": { "query": "персональные данные" },
+      "assertions": ["min_results:1"]
+    },
+    {
+      "id": "ru-003",
+      "tool": "search_legislation",
+      "description": "Search for information security (информационная безопасность)",
+      "input": { "query": "информационная безопасность" },
+      "assertions": ["min_results:1"]
+    },
+    {
+      "id": "ru-004",
+      "tool": "validate_citation",
+      "description": "Validate Federal Law 149-FZ citation",
+      "input": { "citation": "Федеральный закон от 27.07.2006 № 149-ФЗ" },
+      "assertions": ["fields_present:valid"]
+    },
+    {
+      "id": "ru-005",
+      "tool": "format_citation",
+      "description": "Format short citation to full",
+      "input": { "citation": "№ 149-ФЗ", "format": "full" },
+      "assertions": ["result_not_empty"]
+    },
+    {
+      "id": "ru-006",
+      "tool": "check_currency",
+      "description": "Check Constitution status",
+      "input": { "document_id": "constitution-rf" },
+      "assertions": ["result_not_empty"]
+    },
+    {
+      "id": "ru-007",
+      "tool": "list_sources",
+      "description": "List data sources",
+      "input": {},
+      "assertions": ["text_contains:pravo.gov.ru"]
+    },
+    {
+      "id": "ru-008",
+      "tool": "about",
+      "description": "Server metadata",
+      "input": {},
+      "assertions": ["text_contains:Russian Law MCP"]
+    },
+    {
+      "id": "ru-009",
+      "tool": "get_provision",
+      "description": "Non-existent document returns null",
+      "input": { "document_id": "nonexistent-999", "section": "1" },
+      "assertions": ["result_null"]
+    },
+    {
+      "id": "ru-010",
+      "tool": "search_legislation",
+      "description": "Empty query returns empty results",
+      "input": { "query": "" },
+      "assertions": ["result_empty"]
+    },
+    {
+      "id": "ru-011",
+      "tool": "search_legislation",
+      "description": "SQL injection handled safely",
+      "input": { "query": "'; DROP TABLE provisions; --" },
+      "assertions": ["no_error"]
+    },
+    {
+      "id": "ru-012",
+      "tool": "build_legal_stance",
+      "description": "Build legal stance for data protection",
+      "input": { "query": "защита персональных данных" },
+      "assertions": ["result_not_empty"]
+    },
+    {
+      "id": "ru-013",
+      "tool": "get_provision",
+      "description": "Retrieve all provisions of 152-FZ (data protection law)",
+      "input": { "document_id": "fz-152-2006" },
+      "assertions": ["result_not_empty"]
+    },
+    {
+      "id": "ru-014",
+      "tool": "search_legislation",
+      "description": "Search for criminal liability (уголовная ответственность)",
+      "input": { "query": "уголовная ответственность", "limit": 5 },
+      "assertions": ["min_results:1"]
+    },
+    {
+      "id": "ru-015",
+      "tool": "validate_citation",
+      "description": "Validate 152-FZ data protection law citation",
+      "input": { "citation": "Федеральный закон от 27.07.2006 № 152-ФЗ" },
+      "assertions": ["fields_present:valid,document_exists"]
+    },
+    {
+      "id": "ru-016",
+      "tool": "check_currency",
+      "description": "Non-existent document returns null",
+      "input": { "document_id": "nonexistent-law-xyz" },
+      "assertions": ["result_null"]
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0",
+  "jurisdiction": "RU",
+  "description": "SHA-256 hashes of normalized (whitespace-collapsed, lowercased) constitutional provision text. These provisions are stable anchors - if a hash drifts, the source text has changed and the database needs re-ingestion.",
+  "normalization": "content.replace(/\\s+/g, ' ').trim().toLowerCase()",
+  "entries": [
+    {
+      "document_id": "constitution-rf",
+      "article": "1",
+      "sha256": "004d1fac7c2d8c813dbaca7aefcd23963ce198d0e5a33dd1a9c7ea211a14de79",
+      "snippet": "1. российская федерация - россия есть демократическое федеративное правовое госу"
+    },
+    {
+      "document_id": "constitution-rf",
+      "article": "2",
+      "sha256": "72ee2197858cb795cd5302a090f9ca0cc105e5b0c4d9503ffbbc0f33c265d5cd",
+      "snippet": "человек, его права и свободы являются высшей ценностью. признание, соблюдение и "
+    },
+    {
+      "document_id": "constitution-rf",
+      "article": "3",
+      "sha256": "5405a9179225aa91c89331a13ac5f8e31c7c0b23c647be5c7d5fe4bf5cd8ddbf",
+      "snippet": "1. носителем суверенитета и единственным источником власти в российской федераци"
+    },
+    {
+      "document_id": "constitution-rf",
+      "article": "23",
+      "sha256": "d73473588ea0aa2a4bd765b103dc8993fd8f2fe11853787e3e64913bf9fc32a9",
+      "snippet": "1. каждый имеет право на неприкосновенность частной жизни, личную и семейную тай"
+    },
+    {
+      "document_id": "constitution-rf",
+      "article": "29",
+      "sha256": "66e61f6ec7e7db27448b7747f89ff4bb0e5e46dcbb1451130e0040c538fdad02",
+      "snippet": "1. каждому гарантируется свобода мысли и слова. 2. не допускаются пропаганда или"
+    }
+  ]
+}
