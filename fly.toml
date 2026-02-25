@@ -1,3 +1,8 @@
+# fly.toml app configuration file generated for russian-law-mcp on 2026-02-25T19:51:20+01:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
 app = 'russian-law-mcp'
 primary_region = 'arn'
 
@@ -14,3 +19,4 @@ primary_region = 'arn'
   memory = '512mb'
   cpu_kind = 'shared'
   cpus = 1
+  memory_mb = 512
