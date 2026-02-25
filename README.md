@@ -9,7 +9,7 @@
 [![CI](https://github.com/Ansvar-Systems/Russian-Law-MCP/actions/workflows/ci.yml/badge.svg)](https://github.com/Ansvar-Systems/Russian-Law-MCP/actions/workflows/ci.yml)
 [![Daily Data Check](https://github.com/Ansvar-Systems/Russian-Law-MCP/actions/workflows/check-updates.yml/badge.svg)](https://github.com/Ansvar-Systems/Russian-Law-MCP/actions/workflows/check-updates.yml)
 
-Query **108 Russian federal laws** -- from the Civil Code and Criminal Code to the Personal Data Law and Communications Law -- directly from Claude, Cursor, or any MCP-compatible client.
+Query **12,393 Russian federal laws** -- from the Civil Code and Criminal Code to the Personal Data Law and Communications Law -- directly from Claude, Cursor, or any MCP-compatible client. 79,178 provisions, full-text searchable.
 
 If you're building legal tech, compliance tools, or doing Russian legal research, this is your verified reference database.
 
@@ -124,11 +124,14 @@ Once connected, just ask naturally:
 
 | Category | Count | Details |
 |----------|-------|---------|
-| **Laws** | 108 documents | Constitution, codes, federal laws |
-| **Provisions** | 5,364 sections | Full-text searchable with FTS5 |
-| **Database Size** | ~15 MB | Optimized SQLite, portable |
+| **Federal Laws** | 12,132 | All federal laws from 1991-2023 |
+| **Federal Constitutional Laws** | 193 | All FKZ documents |
+| **Codes** | 43 | Civil, Criminal, Labor, Tax, Administrative, etc. |
+| **Constitution** | 1 | Full text (142 articles) |
+| **Total Provisions** | 79,178 | Article-level, full-text searchable (FTS5) |
+| **Database Size** | ~530 MB | SQLite + FTS5, Cyrillic optimized |
 
-**Verified data only** -- every provision is validated against official sources (pravo.gov.ru). Zero LLM-generated content.
+**100% coverage of ingestable Russian federal legislation.** Every provision is sourced from pravo.gov.ru via the [RusLawOD](https://huggingface.co/datasets/irlspbru/RusLawOD) academic dataset. Zero LLM-generated content.
 
 ---
 
@@ -138,7 +141,7 @@ Once connected, just ask naturally:
 
 | Tool | Description |
 |------|-------------|
-| `search_legislation` | FTS5 search on 5,364 provisions with BM25 ranking |
+| `search_legislation` | FTS5 search on 79,178 provisions with BM25 ranking |
 | `get_provision` | Retrieve specific provision by document ID + article/section |
 | `validate_citation` | Validate citation against database (zero-hallucination check) |
 | `build_legal_stance` | Aggregate citations from statutes for a legal question |
@@ -166,9 +169,10 @@ Once connected, just ask naturally:
 
 ## Data Sources & Freshness
 
-All content is sourced from the authoritative Russian legal database:
+All content is sourced from authoritative Russian legal databases:
 
 - **[pravo.gov.ru](http://pravo.gov.ru/)** -- Official Internet Portal for Legal Information (Administration of the President of the Russian Federation)
+- **[RusLawOD](https://huggingface.co/datasets/irlspbru/RusLawOD)** -- Academic open dataset of 304,382 Russian legal documents
 
 ### Copyright Status
 
@@ -194,6 +198,29 @@ See [SECURITY.md](SECURITY.md) for the full policy and vulnerability reporting.
 
 ---
 
+## Open Law
+
+This server is part of **Ansvar Open Law** -- free, structured access to legislation from 70+ jurisdictions worldwide via the Model Context Protocol.
+
+**Browse all jurisdictions ->** [ansvar.eu/open-law](https://ansvar.eu/open-law)
+
+---
+
+## Ansvar MCP Network
+
+Ansvar Open Law is part of the broader **Ansvar MCP Network** -- 95+ servers covering global legislation, EU/US compliance frameworks, and cybersecurity standards.
+
+| Category | Coverage |
+|----------|----------|
+| **Legislation** | 70+ jurisdictions worldwide |
+| **EU Compliance** | 49 regulations, 2,693 articles |
+| **US Compliance** | 15 federal & state regulations |
+| **Security Frameworks** | 261 frameworks, 1,451 controls |
+
+**Explore the full network ->** [ansvar.ai/mcp](https://ansvar.ai/mcp)
+
+---
+
 ## Important Disclaimers
 
 ### Legal Advice
@@ -216,7 +243,7 @@ Queries go through the Claude API. For privileged or confidential matters, use o
 
 ## Documentation
 
-- **[Coverage](COVERAGE.md)** -- Full list of 108 ingested laws
+- **[Coverage](COVERAGE.md)** -- Full list of 12,393 ingested laws
 - **[Coverage Limitations](COVERAGE_LIMITATIONS.md)** -- What's missing and workarounds
 - **[Data Sources](DATA_SOURCES.md)** -- Source provenance and authority levels
 - **[Security Policy](SECURITY.md)** -- Vulnerability reporting and scanning details
@@ -238,6 +265,14 @@ npm run build
 npm test
 ```
 
+### Branch Strategy
+
+```
+feature-branch -> PR to dev -> verify on dev -> PR to main -> deploy
+```
+
+Never push directly to `main`. All changes go through `dev` first.
+
 ### Running Locally
 
 ```bash
@@ -245,25 +280,13 @@ npm run dev                                       # Start MCP server
 npx @anthropic/mcp-inspector node dist/index.js   # Test with MCP Inspector
 ```
 
-### Performance
+### Rebuilding the Database
 
-- **Search Speed:** <100ms for most FTS5 queries
-- **Database Size:** ~15 MB (efficient, portable)
-
----
-
-## Related Projects: Complete Compliance Suite
-
-This server is part of **Ansvar's Compliance Suite** -- MCP servers that work together for end-to-end compliance coverage:
-
-### [@ansvar/eu-regulations-mcp](https://github.com/Ansvar-Systems/EU_compliance_MCP)
-**Query 49 EU regulations directly from Claude** -- GDPR, AI Act, DORA, NIS2, and more. `npx @ansvar/eu-regulations-mcp`
-
-### @ansvar/russian-law-mcp (This Project)
-**Query 108 Russian federal laws directly from Claude** -- Civil Code, Criminal Code, Personal Data Law, and more. `npx @ansvar/russian-law-mcp`
-
-### [@ansvar/us-regulations-mcp](https://github.com/Ansvar-Systems/US_Compliance_MCP)
-**Query US federal and state compliance laws** -- HIPAA, CCPA, SOX, and more. `npx @ansvar/us-regulations-mcp`
+```bash
+python3 scripts/ingest-ruslawod.py   # Ingest from RusLawOD dataset
+npm run build:db                     # Build SQLite from seed files
+npm test                             # Verify everything works
+```
 
 ---
 
@@ -272,10 +295,10 @@ This server is part of **Ansvar's Compliance Suite** -- MCP servers that work to
 Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 Priority areas:
-- Full article-level parsing for stub-entry laws
+- Historical statute versions (amendment tracking)
 - Regional legislation integration
 - Court practice integration
-- Historical statute versions
+- Expanding EU cross-references
 
 ---
 
@@ -289,7 +312,7 @@ If you use this MCP server in academic research:
   title = {Russian Law MCP Server: Federal Legislation Research Tool},
   year = {2026},
   url = {https://github.com/Ansvar-Systems/Russian-Law-MCP},
-  note = {108 Russian federal laws with 5,364 provisions and full-text search}
+  note = {12,393 Russian federal laws with 79,178 provisions and full-text search}
 }
 ```
 
@@ -302,6 +325,7 @@ Apache License 2.0. See [LICENSE](./LICENSE) for details.
 ### Data Licenses
 
 - **Federal Legislation:** Not copyrightable per Article 1259 Civil Code (public domain)
+- **RusLawOD Dataset:** CC BY-NC 4.0 (compilation; law texts themselves are public domain)
 
 ---
 
