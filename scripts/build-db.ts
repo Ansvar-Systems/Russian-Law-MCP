@@ -185,7 +185,7 @@ function buildDatabase(): void {
   `);
 
   const insertProvision = db.prepare(`
-    INSERT INTO provisions (law_id, article, title, content, part, paragraph, provision_ref, order_index, metadata)
+    INSERT OR IGNORE INTO provisions (law_id, article, title, content, part, paragraph, provision_ref, order_index, metadata)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
 
