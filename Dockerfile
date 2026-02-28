@@ -12,59 +12,78 @@
 #   npm run build
 #   docker build -t russian-law-mcp .
 #
-# Run (stdio mode):
-#   docker run -i russian-law-mcp node dist/index.js
-#
-# Run (HTTP mode for Fly.io / remote access):
-#   docker run -p 8080:8080 russian-law-mcp
-#
 # ===============================================================================
 
 # -------------------------------------------------------------------------------
 # STAGE 1: BUILD
+# -------------------------------------------------------------------------------
+# Compiles TypeScript to JavaScript
 # -------------------------------------------------------------------------------
 
 FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+# Copy package files first (for better caching)
 COPY package*.json ./
+
+# Install ALL dependencies (including dev)
+# --ignore-scripts prevents postinstall from running
 RUN npm ci --ignore-scripts
 
+# Copy TypeScript config and source
 COPY tsconfig.json ./
 COPY src ./src
 
+# Compile TypeScript
 RUN npm run build
 
 # -------------------------------------------------------------------------------
 # STAGE 2: PRODUCTION
+# -------------------------------------------------------------------------------
+# Minimal image with only production dependencies
 # -------------------------------------------------------------------------------
 
 FROM node:20-alpine AS production
 
 WORKDIR /app
 
+# Copy package files
 COPY package*.json ./
+
+# Install production dependencies only
 RUN npm ci --omit=dev
 
 # Copy compiled JavaScript from builder stage
 COPY --from=builder /app/dist ./dist
 
-# Security: non-root user (create BEFORE copying large files to avoid chown layer)
+# Copy pre-built database
+# This file MUST exist — run ingestion first
+COPY data/database.db ./data/database.db
+
+# -------------------------------------------------------------------------------
+# SECURITY
+# -------------------------------------------------------------------------------
+# Create and use non-root user
+# -------------------------------------------------------------------------------
+
 RUN addgroup -S nodejs && adduser -S nodejs -G nodejs
-
-# Copy pre-built database (--chown avoids a separate 542MB chown layer)
-COPY --chown=nodejs:nodejs data/database.db ./data/database.db
-
 USER nodejs
 
-# Environment
+# -------------------------------------------------------------------------------
+# ENVIRONMENT
+# -------------------------------------------------------------------------------
+
+# Production mode
 ENV NODE_ENV=production
+
+# Database path (matches the COPY destination above)
 ENV RUSSIAN_LAW_DB_PATH=/app/data/database.db
-ENV PORT=8080
 
-EXPOSE 8080
+# -------------------------------------------------------------------------------
+# ENTRY POINT
+# -------------------------------------------------------------------------------
+# MCP servers use stdio, so we run node directly
+# -------------------------------------------------------------------------------
 
-# Default: HTTP server for remote deployment (Fly.io)
-# Override with "node dist/index.js" for stdio mode
-CMD ["node", "dist/serve.js"]
+CMD ["node", "dist/http-server.js"]
